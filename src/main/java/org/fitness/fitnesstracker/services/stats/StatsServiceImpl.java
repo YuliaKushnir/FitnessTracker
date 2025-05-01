@@ -1,11 +1,19 @@
 package org.fitness.fitnesstracker.services.stats;
 
 import lombok.RequiredArgsConstructor;
+import org.fitness.fitnesstracker.dto.GraphDto;
 import org.fitness.fitnesstracker.dto.StatsDto;
+import org.fitness.fitnesstracker.models.Activity;
+import org.fitness.fitnesstracker.models.Workout;
 import org.fitness.fitnesstracker.repository.ActivityRepository;
 import org.fitness.fitnesstracker.repository.GoalRepository;
 import org.fitness.fitnesstracker.repository.WorkoutRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,4 +51,18 @@ public class StatsServiceImpl implements StatsService {
 
         return statsDto;
     }
+
+    public GraphDto getGraphStats(){
+        Pageable pageable = PageRequest.of(0, 7);
+
+        List<Workout> workouts = workoutRepository.findLastSevenWorkouts(pageable);
+        List<Activity> activities = activityRepository.findLastSevenWorkouts(pageable);
+
+        GraphDto graphDto = new GraphDto();
+        graphDto.setWorkouts(workouts.stream().map(Workout::getWorkoutDto).collect(Collectors.toList()));
+        graphDto.setActivities(activities.stream().map(Activity::getActivityDto).collect(Collectors.toList()));
+
+        return graphDto;
+    }
+
 }
